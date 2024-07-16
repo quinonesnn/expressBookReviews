@@ -34,50 +34,73 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-    res.send(JSON.stringify(books,null,4));
-  });
+  return new Promise((resolve, reject) => {
+    if (!resolve) {
+        res.status(400).json({message: "Error "})
+        reject()
+    } else {
+        
+        res.status(200).send(JSON.stringify(books))
+        resolve()
+    }
+  })
+});
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  const ISBN = req.params.isbn;
-  
-  res.send(books[ISBN])
- });
+    return new Promise((resolve, reject) => {
+        if (!req.params.isbn) {
+            res.status(400).json({message: "Error "})
+            reject()
+        } else {
+            res.status(200).send(books[req.params.isbn])
+            resolve()
+        }
+    })
+});
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
   //Write your code here
-  let ans = []
-  for(const [key, values] of Object.entries(books)){
-      const book = Object.entries(values);
-      for(let i = 0; i < book.length ; i++){
-          if(book[i][0] == 'author' && book[i][1] == req.params.author){
-              ans.push(books[key]);
-          }
-      }
-  }
-  if(ans.length == 0){
-      return res.status(300).json({message: "Author not found"});
-  }
-  res.send(ans);
+  return new Promise((resolve, reject) => {
+    if (!req.params.author) {
+        res.status(400).json({message: "Oops! There's an error somewhere! "})
+        reject()
+    } else {
+        let ans = []
+        for(const [key, values] of Object.entries(books)){
+            const book = Object.entries(values);
+            for(let i = 0; i < book.length ; i++){
+                if(book[i][0] == 'author' && book[i][1] == req.params.author){
+                    ans.push(books[key]);
+                }
+            }
+        }
+        res.send(ans)
+        resolve()
+    }
+  })
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-    let ans = []
-    for(const [key, values] of Object.entries(books)){
-        const book = Object.entries(values);
-        for(let i = 0; i < book.length ; i++){
-            if(book[i][0] == 'title' && book[i][1] == req.params.title){
-                ans.push(books[key]);
+    return new Promise((resolve, reject) => {
+        if (!req.params.title) {
+            return res.status(400).json({message: "Title not found"});
+            reject()
+        } else {
+            let ans = []
+            for(const [key, values] of Object.entries(books)){
+                const book = Object.entries(values);
+                for(let i = 0; i < book.length ; i++){
+                    if(book[i][0] == 'title' && book[i][1] == req.params.title){
+                        ans.push(books[key]);
+                    }
+                }
             }
+            res.send(ans);
         }
-    }
-    if(ans.length == 0){
-        return res.status(300).json({message: "Title not found"});
-    }
-    res.send(ans);
+    })
 });
 
 //  Get book review
